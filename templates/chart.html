@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}User Analytics Dashboard - Charts{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Data Processing
+      const severityCounts = {
+        'Normal': {{ severity_counts['Normal'] }},
+        'Doubtful': {{ severity_counts['Doubtful'] }},
+        'Mild': {{ severity_counts['Mild'] }},
+        'Moderate': {{ severity_counts['Moderate'] }},
+        'Severe': {{ severity_counts['Severe'] }}
+      };
+      
+      const rawTimeData = {{ timeline_data | tojson | safe }};
+
+      // Configuration logic
+      Chart.defaults.font.family = "'Inter', sans-serif";
+      
+      const bgColor = ['#28a745', '#17a2b8', '#ffc107', '#fd7e14', '#dc3545'];
+
+      // Doughnut
+      new Chart(document.getElementById('piechart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Normal', 'Doubtful', 'Mild', 'Moderate', 'Severe'],
+          datasets: [{
+            data: [severityCounts.Normal, severityCounts.Doubtful, severityCounts.Mild, severityCounts.Moderate, severityCounts.Severe],
+            backgroundColor: bgColor, borderWidth: 0, hoverOffset: 4
+          }]
+        },
+        options: { 
+          responsive: true, maintainAspectRatio: false, 
+          plugins: { 
+            title: { display: true, text: 'Diagnostic Distribution', font: {size: 16} }, 
+            legend: { position: 'bottom' } 
+          } 
+        }
+      });
+
+      // Bar Chart
+      new Chart(document.getElementById('barchart').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Normal', 'Doubtful', 'Mild', 'Moderate', 'Severe'],
+          datasets: [{
+            label: 'Total Scans',
+            data: [severityCounts.Normal, severityCounts.Doubtful, severityCounts.Mild, severityCounts.Moderate, severityCounts.Severe],
+            backgroundColor: bgColor, borderRadius: 6
+          }]
+        },
+        options: { 
+          responsive: true, maintainAspectRatio: false, 
+          plugins: { 
+            title: { display: true, text: 'Total Scans per Severity', font: {size: 16} }, 
+            legend: { display: false } 
+          },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      });
+
+      // Timeline Data Handling
+      if (rawTimeData && rawTimeData.length > 0) {
+        const labels = rawTimeData.map((_, i) => `Scan ${i+1}`);
+        const confidences = rawTimeData.map(d => d.confidence);
+        
+        // Line Chart
+        new Chart(document.getElementById('linechart').getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Confidence (%)',
+              data: confidences,
+              borderColor: '#007bff',
+              backgroundColor: 'rgba(0, 123, 255, 0.1)',
+              tension: 0.3, fill: true, pointRadius: 5
+            }]
+          },
+          options: { 
+            responsive: true, maintainAspectRatio: false, 
+            plugins: { title: { display: true, text: 'Classifier Confidence Trend', font: {size: 16} } }, 
+            scales: { y: { min: 0, max: 100 } } 
+          }
+        });
+
+        // Scatter Plot
+        const severityMap = {"Normal": 0, "Doubtful": 1, "Mild": 2, "Moderate": 3, "Severe": 4};
+        const scatterData = rawTimeData.map(d => ({ x: d.confidence, y: severityMap[d.severity] || 0 }));
+        
+        new Chart(document.getElementById('scatterchart').getContext('2d'), {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              label: 'Predictions',
+              data: scatterData,
+              backgroundColor: '#6f42c1',
+              pointRadius: 6, pointHoverRadius: 8
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { 
+              title: { display: true, text: 'Certainty vs. Severity', font: {size: 16} }, 
+              legend: {display: false},
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `Conf: ${context.parsed.x}% | Rank: ${context.parsed.y}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { title: { display: true, text: 'Confidence (%)' }, min: 50, max: 100 },
+              y: { title: { display: true, text: 'Severity Rank (0=Normal, 4=Severe)' }, min: -0.5, max: 4.5, ticks: { stepSize: 1 } }
+            }
+          }
+        });
+      } else {
+        document.getElementById('linechart-container').innerHTML = '<div class="text-center text-muted font-italic w-100">No tracking data found for trend line. Upload an X-ray first.</div>';
+        document.getElementById('scatterchart-container').innerHTML = '<div class="text-center text-muted font-italic w-100">No tracking data found for scatter plot.</div>';
+      }
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <section class="py-5 bg-light h-100">
+    <div class="container pt-4">
+      <div class="text-center mb-5">
+        <h6 class="text-uppercase text-primary font-weight-bold">Analytics</h6>
+        <h2 class="font-weight-bold">Personal Prediction Statistics</h2>
+        <p class="text-muted">A dynamic multi-chart overview of your uploaded knee X-ray analyses. Total Predictions: <strong>{{ total_preds }}</strong></p>
+      </div>
+
+      <!-- Pie & Bar Chart Row -->
+      <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-body p-4 bg-white d-flex justify-content-center align-items-center">
+              <div style="position: relative; width: 100%; height: 320px;">
+                <canvas id="piechart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-body p-4 bg-white d-flex justify-content-center align-items-center">
+              <div style="position: relative; width: 100%; height: 320px;">
+                <canvas id="barchart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line & Scatter Chart Row -->
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-body p-4 bg-white d-flex justify-content-center align-items-center" id="linechart-container">
+              <div style="position: relative; width: 100%; height: 320px;">
+                <canvas id="linechart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-body p-4 bg-white d-flex justify-content-center align-items-center" id="scatterchart-container">
+              <div style="position: relative; width: 100%; height: 320px;">
+                <canvas id="scatterchart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Data Option -->
+      <div class="text-center mt-3">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary px-5 rounded-pill shadow-sm"><i class="fa fa-list"></i> Return to Table View</a>
+      </div>
+
+    </div>
+  </section>
+{% endblock %}

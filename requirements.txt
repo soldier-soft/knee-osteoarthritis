@@ -1,0 +1,23 @@
+tensorflow==2.4.0
+keras==2.4.3
+Flask==2.0.1
+Werkzeug==2.0.3
+pillow==8.4.0
+protobuf==3.20.0
+numpy==1.19.5
+h5py==2.10.0
+pymongo
+Flask-Login
+Flask-Bcrypt
+opencv-python
+
+python 3.8 (64 bit)
+
+ 
+
+
+install Visual C++  
+  
+Link -   https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0     
+
+ Dowmload--- x64: vc_redist.x64.exe

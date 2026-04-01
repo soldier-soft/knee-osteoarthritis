@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction Report - Knee Osteoarthritis{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .report-container { max-width: 900px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .header-bar { border-bottom: 2px solid #eaebec; padding-bottom: 20px; text-align: center; margin-bottom: 30px; }
+    .section-title { font-size: 1.15rem; font-weight: 600; color: #333; margin-top: 20px; margin-bottom: 10px; }
+    .list-styled { padding-left: 20px; color: #555; }
+    .list-styled li { margin-bottom: 6px; }
+    .badge-severity { font-size: 1rem; padding: 6px 12px; }
+    
+    @media print {
+      body { background: white !important; margin: 0; padding: 0; }
+      .header_section, .footer_section, .navbar, .btn { display: none !important; }
+      .report-container { max-width: 100%; box-shadow: none; padding: 0; }
+      .container { max-width: 100%; }
+      @page { margin: 1cm; size: portrait; }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="py-5">
+    <div class="container text-right mb-3" style="max-width: 900px;">
+      <button onclick="window.print()" class="btn btn-dark shadow-sm"><i class="fa fa-file-pdf-o"></i> Export as PDF Report</button>
+      <a href="{{url_for('main.index')}}" class="btn btn-outline-secondary ml-2 shadow-sm">Analyze Another</a>
+    </div>
+
+    <div class="report-container" id="reportContent">
+      <div class="header-bar">
+        <h6 class="text-uppercase text-muted font-weight-bold mb-2">Prediction</h6>
+        <h2 class="font-weight-bold">PREDICT KNEE OSTEOARTHRITIS</h2>
+      </div>
+
+      <div class="row align-items-center mb-5 border-bottom pb-4">
+        <div class="col-md-4 text-center">
+          <p class="text-left text-muted mb-2 font-weight-bold small">File: {{ filename }}</p>
+          <img src="/{{ img_path }}" class="img-fluid rounded border shadow-sm" style="max-height: 200px;">
+        </div>
+        <div class="col-md-8">
+          <p class="mb-2"><strong>Prediction:</strong> <span class="font-weight-bold 
+            {% if prediction == 'Normal' %}text-success
+            {% elif prediction == 'Doubtful' %}text-info
+            {% elif prediction == 'Mild' %}text-warning
+            {% elif prediction == 'Moderate' %}text-orange
+            {% else %}text-danger{% endif %}" {% if prediction == 'Moderate' %}style="color: #fd7e14;"{% endif %}>{{ prediction }}</span> Risk
+          </p>
+          <p class="mb-2"><strong>Confidence:</strong> {{ confidence }}%</p>
+          <p class="mb-0 text-muted small"><strong>Quality:</strong> 
+            {% if is_blurry %}Low-quality image detected. Prediction generated, but recapturing a clearer X-ray is recommended.
+            {% else %}High quality image. Valid for clinical assessment.
+            {% endif %}
+          </p>
+        </div>
+      </div>
+
+      <div class="ai-summary p-4 bg-light rounded" style="border: 1px solid #e9ecef;">
+        <h4 class="font-weight-bold mb-4 border-bottom pb-2">AI Clinical Summary</h4>
+        
+        <p class="mb-2"><strong>Severity:</strong> <span class="badge badge-severity text-white
+            {% if prediction == 'Normal' %}bg-success
+            {% elif prediction == 'Doubtful' %}bg-info
+            {% elif prediction == 'Mild' %}bg-warning text-dark
+            {% elif prediction == 'Moderate' %}bg-orange
+            {% else %}bg-danger{% endif %}" {% if prediction == 'Moderate' %}style="background-color: #fd7e14;"{% endif %}>{{ prediction }}</span></p>
+            
+        <p class="mb-4 text-muted font-italic" style="font-size: 0.9rem;">
+          <strong>Confidence Note:</strong> {% if confidence > 85 %}High confidence prediction.{% else %}Medium confidence prediction. Manual verification advised.{% endif %}
+        </p>
+
+        <h5 class="section-title">Why It May Have Happened</h5>
+        <ul class="list-styled">
+          {% if prediction == 'Normal' %}
+            <li>There are no significant signs of joint degeneration.</li>
+            <li>Cartilage spacing appears normal and well-maintained.</li>
+          {% elif prediction == 'Doubtful' %}
+            <li>Very minor, unconfirmed joint space narrowing.</li>
+            <li>Early signs of possible wear, but osteophytic lipping is not fully definitive.</li>
+          {% elif prediction == 'Mild' %}
+            <li>Definite early signs of cartilage wear and tear are present.</li>
+            <li>Definite osteophytes (bone spurs) with possible joint space narrowing.</li>
+          {% elif prediction == 'Moderate' %}
+            <li>Clear osteoarthritic progression with moderate multiple osteophytes.</li>
+            <li>Definite narrowing of joint space and some sclerosis (thickening of bone).</li>
+            <li>Inflammation and mechanical overload are likely causing structural change.</li>
+          {% else %} <!-- Severe -->
+            <li>Severe osteoarthritic progression with large osteophytes.</li>
+            <li>Marked joint space narrowing resulting in severe bone-on-bone friction.</li>
+            <li>Severe sclerosis and likely deformity of bone contour.</li>
+          {% endif %}
+        </ul>
+
+        <h5 class="section-title">Precautions</h5>
+        <ul class="list-styled">
+          {% if prediction == 'Normal' %}
+            <li>Maintain a healthy diet and weight to keep joints stress-free.</li>
+            <li>Continue regular moderate exercises to maintain flexibility.</li>
+          {% elif prediction == 'Doubtful' %}
+            <li>Adopt minor preventative measures like controlling body weight.</li>
+            <li>Be mindful during heavy repetitive joint loading.</li>
+          {% elif prediction == 'Mild' %}
+            <li>Avoid excessive high-impact activity or heavy lifting.</li>
+            <li>Utilize proper supportive footwear during daily activities.</li>
+          {% elif prediction == 'Moderate' %}
+            <li>Avoid high-impact activity completely to prevent further degradation.</li>
+            <li>Use knee support sleeves during prolonged standing or walking.</li>
+          {% else %} <!-- Severe -->
+            <li>Avoid all high-impact activity immediately to prevent severe pain spikes.</li>
+            <li>Use walking aids (canes or crutches) to significantly reduce joint load bearing.</li>
+          {% endif %}
+        </ul>
+
+        <h5 class="section-title">Recommended Next Steps</h5>
+        <ul class="list-styled">
+          {% if prediction == 'Normal' %}
+            <li>No clinical intervention required at this time. Routine checkups are sufficient.</li>
+          {% elif prediction == 'Doubtful' %}
+            <li>Consider a preventative routine such as light physical therapy to strengthen leg muscles.</li>
+            <li>Re-evaluate in 6 to 12 months.</li>
+          {% elif prediction == 'Mild' %}
+            <li>Consult a general practitioner for early-stage preventative care and symptom management.</li>
+            <li>Schedule sessions with a physiotherapist.</li>
+          {% elif prediction == 'Moderate' %}
+            <li>Book an orthopedic consultation for a structured treatment plan.</li>
+            <li>Discuss pharmacological management (NSAIDs) or corticosteroid injections.</li>
+          {% else %} <!-- Severe -->
+            <li>Seek an orthopedic surgeon immediately for aggressive intervention.</li>
+            <li>Discuss eligibility for surgical reconstruction, such as a Total Knee Arthroplasty (Replacement).</li>
+          {% endif %}
+        </ul>
+
+        <h5 class="section-title text-danger">Urgent Warning Signs</h5>
+        <ul class="list-styled text-danger">
+          <li>Persistent night pain or rapidly sudden increasing pain.</li>
+          <li>Knee swelling with fever or surrounding redness.</li>
+          <li>Sudden inability to bear weight or severe mechanical "locking" of the joint.</li>
+        </ul>
+        
+        <hr class="mt-4">
+        <p class="text-muted small font-italic mb-0 text-center">AI output is supportive information only, not a final medical diagnosis. Please consult an orthopedic specialist.</p>
+      </div>
+
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

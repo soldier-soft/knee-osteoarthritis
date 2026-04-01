@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Prediction - Knee Osteoarthritis{% endblock %}
+
+{% block extra_css %}
+  <style>
+    /* Add basic loading spinner */
+    .loader {
+      border: 6px solid #f3f3f3; border-top: 6px solid #3498db;
+      border-radius: 50%; width: 50px; height: 50px;
+      animation: spin 1s linear infinite; margin: 20px auto; display: none;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="department_section layout_padding pt-5">
+    <div class="container text-center">
+      <div class="heading_container heading_center mb-4">
+        <h2>Predict Knee Osteoarthritis</h2>
+        <p class="text-muted mt-2">Upload a patient knee X-Ray below to instantly classify the progression severity.</p>
+      </div>
+
+      <div class="card shadow border-0 mt-4 mx-auto" style="max-width: 500px; border-radius: 20px;">
+        <div class="card-body p-5 bg-light">
+          <h4 class="mb-4 text-secondary"><i class="fa fa-file-image-o mr-2"></i> Upload X-Ray Image</h4>
+          <form id="uploadForm" action="{{ url_for('main.get_output') }}" method="POST" enctype="multipart/form-data" onsubmit="showLoading()">
+            <div class="form-group">
+              <input type="file" name="my_image" id="imagefile" class="form-control-file align-center bg-white p-2 border rounded" accept=".png, .jpg, .jpeg" onchange="previewImage();" required style="margin-left:auto; margin-right:auto; max-width:100%;">
+              <small class="form-text text-muted mt-2">Accepted formats: .jpg, .jpeg, .png</small>
+            </div>
+            
+            <img id="preview" class="img-fluid rounded mt-3 mb-4 shadow-sm border" style="max-height: 250px; display: none; object-fit: contain;">
+
+            <div class="loader" id="loader"></div>
+
+            <button class="btn btn-primary btn-lg btn-block mt-3" type="submit" id="submitBtn" style="border-radius: 30px;">
+              <i class="fa fa-upload"></i> Analyze & Predict
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    function previewImage() {
+        var file = document.getElementById("imagefile").files;
+        if (file.length > 0) {
+            var fileReader = new FileReader();
+            fileReader.onload = function (event) {
+                var preview = document.getElementById("preview");
+                preview.setAttribute("src", event.target.result);
+                preview.style.display = "inline-block";
+            };
+            fileReader.readAsDataURL(file[0]);
+        }
+    }
+    function showLoading() {
+      document.getElementById('loader').style.display = 'block';
+      document.getElementById('submitBtn').style.display = 'none';
+    }
+  </script>
+{% endblock %}

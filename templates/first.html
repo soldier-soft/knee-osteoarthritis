@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Knee Osteoarthritis Predictor - Home{% endblock %}
+
+{% block extra_css %}
+.info-card {
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+  margin-bottom: 30px;
+}
+.info-card:hover { transform: translateY(-5px); }
+.icon-box {
+  width: 60px; height: 60px;
+  background: #007bff; color: white;
+  border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 24px; margin-bottom: 15px;
+}
+.hero_area {
+  position: relative;
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ url_for("static", filename="images/knee10.jpg") }}') center/cover;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  margin-top: -80px; /* offset the navbar height */
+}
+{% endblock %}
+
+{% block content %}
+<div class="hero_area pt-5">
+  <div class="container text-center text-white pb-5">
+    <h1 class="display-4 font-weight-bold mb-4">A Novel Method to Predict Knee Osteoarthritis</h1>
+    <p class="lead mb-5">Harnessing Deep Learning and AI to analyze X-Rays and provide instant, accurate clinical severity predictions.</p>
+    {% if current_user.is_authenticated %}
+      <a href="{{url_for('main.index')}}" class="btn btn-primary btn-lg px-5 shadow" style="border-radius: 30px;">Start Prediction Analysis</a>
+    {% else %}
+      <a href="{{url_for('auth.login')}}" class="btn btn-primary btn-lg px-5 shadow" style="border-radius: 30px;">Login to Start Prediction</a>
+    {% endif %}
+  </div>
+</div>
+
+<section class="about_section layout_padding bg-light py-5">
+  <div class="container">
+    <div class="heading_container heading_center mb-5 text-center">
+      <h2>Understanding Knee Osteoarthritis</h2>
+      <p class="text-muted mt-3">Osteoarthritis is the most common form of arthritis, affecting millions of people worldwide. It occurs when the protective cartilage that cushions the ends of your bones wears down over time.</p>
+    </div>
+    
+    <div class="row pt-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card info-card shadow-sm border-0 h-100 p-4 text-center">
+          <div class="icon-box mx-auto bg-danger"><i class="fa fa-exclamation-triangle"></i></div>
+          <h5 class="font-weight-bold">Common Symptoms</h5>
+          <ul class="text-left mt-3 text-muted" style="font-size: 0.95rem;">
+            <li>Pain during or after movement</li>
+            <li>Joint stiffness upon waking up</li>
+            <li>Loss of joint flexibility</li>
+            <li>Grating sensation or "popping"</li>
+            <li>Bone spurs around the joint</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="card info-card shadow-sm border-0 h-100 p-4 text-center">
+          <div class="icon-box mx-auto bg-warning"><i class="fa fa-search"></i></div>
+          <h5 class="font-weight-bold">Primary Causes</h5>
+          <ul class="text-left mt-3 text-muted" style="font-size: 0.95rem;">
+            <li>Old age and natural wear/tear</li>
+            <li>Previous joint injuries or tears</li>
+            <li>Repeated joint stress</li>
+            <li>Genetics and bone deformities</li>
+            <li>Certain metabolic diseases</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="card info-card shadow-sm border-0 h-100 p-4 text-center">
+          <div class="icon-box mx-auto bg-success"><i class="fa fa-shield"></i></div>
+          <h5 class="font-weight-bold">Prevention Methods</h5>
+          <ul class="text-left mt-3 text-muted" style="font-size: 0.95rem;">
+            <li>Maintain a healthy body weight</li>
+            <li>Control blood sugar levels</li>
+            <li>Be active but protect your joints</li>
+            <li>Avoid repetitive high-stress movements</li>
+            <li>Rest when joints feel painful</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="card info-card shadow-sm border-0 h-100 p-4 text-center">
+          <div class="icon-box mx-auto bg-primary"><i class="fa fa-user-md"></i></div>
+          <h5 class="font-weight-bold">Doctor's Advice</h5>
+          <ul class="text-left mt-3 text-muted" style="font-size: 0.95rem;">
+            <li>Consult if pain lasts > 3 days</li>
+            <li>Engage in low-impact activities like swimming</li>
+            <li>Use supportive braces if needed</li>
+            <li>Follow prescribed physiotherapy</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{{url_for('main.prevention')}}" class="btn btn-outline-info rounded-pill px-4">Read Full Medical Overviews</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
