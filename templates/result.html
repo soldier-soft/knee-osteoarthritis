@@ -35,24 +35,76 @@
       </div>
 
       <div class="row align-items-center mb-5 border-bottom pb-4">
-        <div class="col-md-4 text-center">
-          <p class="text-left text-muted mb-2 font-weight-bold small">File: {{ filename }}</p>
-          <img src="/{{ img_path }}" class="img-fluid rounded border shadow-sm" style="max-height: 200px;">
+        <div class="col-md-6 text-center border-right">
+          <p class="text-left text-muted mb-2 font-weight-bold small">Original X-Ray: {{ filename }}</p>
+          <img src="/{{ img_path }}" class="img-fluid rounded border shadow-sm" style="max-height: 250px;">
         </div>
-        <div class="col-md-8">
-          <p class="mb-2"><strong>Prediction:</strong> <span class="font-weight-bold 
-            {% if prediction == 'Normal' %}text-success
-            {% elif prediction == 'Doubtful' %}text-info
-            {% elif prediction == 'Mild' %}text-warning
-            {% elif prediction == 'Moderate' %}text-orange
-            {% else %}text-danger{% endif %}" {% if prediction == 'Moderate' %}style="color: #fd7e14;"{% endif %}>{{ prediction }}</span> Risk
-          </p>
-          <p class="mb-2"><strong>Confidence:</strong> {{ confidence }}%</p>
-          <p class="mb-0 text-muted small"><strong>Quality:</strong> 
-            {% if is_blurry %}Low-quality image detected. Prediction generated, but recapturing a clearer X-ray is recommended.
-            {% else %}High quality image. Valid for clinical assessment.
+        <div class="col-md-6 text-center">
+          <p class="text-left text-muted mb-2 font-weight-bold small">Grad-CAM Heatmap Visualization</p>
+          <img src="/{{ heatmap_path if heatmap_path else img_path }}" class="img-fluid rounded border shadow-sm" style="max-height: 250px;">
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <div class="col-12">
+            <h4 class="font-weight-bold mb-3 border-bottom pb-2">Detailed Analysis Report</h4>
+            
+            {% if report %}
+            <div class="table-responsive">
+              <table class="table table-bordered shadow-sm bg-white text-left">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Metric</th>
+                    <th>Result / Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Image Type Validated</strong></td>
+                    <td>
+                      {% if report.image_type == 'X-ray' %}<span class="text-success"><i class="fa fa-check-circle"></i> {{ report.image_type }}</span>
+                      {% else %}<span class="text-danger"><i class="fa fa-times-circle"></i> {{ report.image_type }}</span>{% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Knee Structure Detected</strong></td>
+                    <td>
+                      {% if report.knee_detected == 'Yes' %}<span class="text-success"><i class="fa fa-check-circle"></i> Confirmed via Deep Learning</span>
+                      {% else %}<span class="text-danger"><i class="fa fa-times-circle"></i> {{ report.knee_detected }}</span>{% endif %}
+                    </td>
+                  </tr>
+                   <tr>
+                    <td><strong>Validation Check Status</strong></td>
+                    <td>
+                      {% if report.failed_step == 'None' %}<span class="text-success"><i class="fa fa-check-circle"></i> Passed all 3 primary checks</span>
+                      {% else %}<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> Failed at: {{ report.failed_step }}</span>{% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Image Quality</strong></td>
+                    <td>
+                      {% if report.quality == 'High' %}<span class="badge badge-success">High Quality</span>
+                      {% else %}<span class="badge badge-warning">Low / Blurry</span>{% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ensemble Model Agreement</strong></td>
+                    <td class="font-weight-bold">{{ report.model_agreement }} Match</td>
+                  </tr>
+                  <tr class="bg-light">
+                    <td><strong>Final Classification Assessment</strong></td>
+                    <td class="font-weight-bold" style="font-size: 1.1rem;">{{ prediction }} Risk <span class="text-muted" style="font-size: 0.9rem;">(Confidence: {{ confidence }}%)</span></td>
+                  </tr>
+                  <tr class="bg-light">
+                    <td><strong>Final System Decision</strong></td>
+                    <td class="font-weight-bold text-success"><i class="fa fa-check"></i> Accepted & Graded</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <div class="alert alert-warning">Analysis report unavailable for this legacy entry.</div>
             {% endif %}
-          </p>
         </div>
       </div>
 

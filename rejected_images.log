@@ -1,0 +1,12 @@
+REJECTED: static\tests\PPDT_story_making.jpg | STEP: Step 3 (Secondary Model Verification) | MSG: Image validation failed. Secondary model rejected input. Please upload a clearer knee X-ray.
+REJECTED: static\tests\PPDT_story_making.jpg | STEP: Step 3 (Secondary Model Verification) | MSG: Image validation failed. Secondary model rejected input. Please upload a clearer knee X-ray.
+REJECTED: static\tests\Screenshot_2026-04-03_120547.png | STEP: Step 3 (Secondary Model Verification) | MSG: Image validation failed. Secondary model rejected input. Please upload a clearer knee X-ray.
+REJECTED: static\tests\C0468594-Osteoarthritis_of_the_knee_X-ray.jpg | STEP: Step 3 (Secondary Model Verification) | MSG: Image validation failed. Secondary model rejected input. Please upload a clearer knee X-ray.
+REJECTED: static\tests\ModerateG3_18.png | STEP: Step 3 (Secondary Model Verification) | MSG: Image validation failed. Secondary model rejected input. Please upload a clearer knee X-ray.
+REJECTED: static\tests\Screenshot_2026-03-28_113509.png | STEP: Step 3 (Secondary Model Verification) | MSG: Image validation failed. Secondary model rejected input (Score: 0.29). Please upload a clearer knee X-ray.
+REJECTED: static\tests\testing.jpg | STEP: Step 2 (Skeleton Analysis) | MSG: Invalid Image Detected. Expected a dominant skeleton-like structure. Please upload a clear knee X-ray (avoid text snippets or unrelated crops).
+REJECTED: static\tests\Screenshot_2026-04-01_214718.png | STEP: Step 3 (Histogram Validation) | MSG: No knee joint detected. Histogram validation failed. Please upload a proper knee X-ray.
+REJECTED: static\tests\Screenshot_2026-04-01_214552.png | STEP: Step 2 (Skeleton Analysis) | MSG: Invalid Image Detected. Expected a dominant skeleton-like structure. Please upload a clear knee X-ray (avoid text snippets or unrelated crops).
+REJECTED: static\tests\Screenshot_2026-04-01_214718.png | STEP: Step 3 (Histogram Validation) | MSG: No knee joint detected. Histogram validation failed. Please upload a proper knee X-ray.
+REJECTED: static\tests\Screenshot_2026-03-28_113509.png | STEP: Step 3 (Secondary Model Verification) | MSG: Image validation failed. Secondary model rejected input (Score: 0.29). Please upload a clearer knee X-ray.
+REJECTED: static\tests\Screenshot_2026-03-30_171452.png | STEP: Step 2 (Skeleton Analysis) | MSG: Invalid Image Detected. Expected a dominant skeleton-like structure. Please upload a clear knee X-ray (avoid text snippets or unrelated crops).

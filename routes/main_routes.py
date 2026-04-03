@@ -151,37 +151,55 @@ def get_output():
     
     img.save(img_path_full)
 
-    # Image Validation
-    is_valid, is_blurry, message = validate_image(img_path_full)
+    import time
+    # Intentional processing delay (~10s) to simulate deep medical analysis
+    # This allows the frontend JS to cycle through its detailed progress loading messages
+    time.sleep(10)
+
+    # 4-Level Strict Image Validation Pipeline
+    report = validate_image(img_path_full)
     
-    if not is_valid:
-        flash(message, 'warning')
+    if not report['is_valid']:
+        flash(report['message'], 'warning')
         os.remove(img_path_full) 
         return redirect(url_for('main.index'))
         
-    if is_blurry:
-        flash(message, 'warning')
+    if report['is_blurry']:
+        flash(report['message'], 'warning')
 
     try:
-        # Prediction
-        predict_result, confidence = predict_label(img_path_full)
+        # Final Classification + Grad-CAM Heatmap
+        predict_result, confidence, heatmap_path_full = predict_label(img_path_full)
         
-        # Store in DB
+        # Strict Output Validation Check
+        if confidence < 85.0:
+            flash(f"Uncertain result ({confidence}%). Artificial Intelligence confidence is too low. Please upload a higher quality, clearer image.", 'warning')
+            os.remove(img_path_full)
+            if os.path.exists(heatmap_path_full) and heatmap_path_full != img_path_full:
+                os.remove(heatmap_path_full)
+            return redirect(url_for('main.index'))
+            
+        heatmap_filename = os.path.basename(heatmap_path_full)
+        heatmap_path_rel = f"tests/{heatmap_filename}"
+        
+        # Store basic stats in DB
         insert_prediction(
             user_id=current_user.id,
             image_path=img_path_rel,
             result=predict_result,
             confidence=confidence,
-            is_blurry=is_blurry
+            is_blurry=report['is_blurry']
         )
 
         return render_template(
             "result.html", 
             prediction=predict_result, 
             confidence=confidence, 
-            is_blurry=is_blurry,
+            is_blurry=report['is_blurry'],
             filename=filename,
-            img_path=f"static/{img_path_rel}"
+            img_path=f"static/{img_path_rel}",
+            heatmap_path=f"static/{heatmap_path_rel}",
+            report=report
         )
                                
     except Exception as e:

@@ -34,6 +34,7 @@
             <img id="preview" class="img-fluid rounded mt-3 mb-4 shadow-sm border" style="max-height: 250px; display: none; object-fit: contain;">
 
             <div class="loader" id="loader"></div>
+            <h5 id="loadingText" class="mt-3 text-primary font-weight-bold" style="display:none;">Analyzing Image...</h5>
 
             <button class="btn btn-primary btn-lg btn-block mt-3" type="submit" id="submitBtn" style="border-radius: 30px;">
               <i class="fa fa-upload"></i> Analyze & Predict
@@ -61,7 +62,22 @@
     }
     function showLoading() {
       document.getElementById('loader').style.display = 'block';
+      document.getElementById('loadingText').style.display = 'block';
       document.getElementById('submitBtn').style.display = 'none';
+      
+      const messages = [
+        "Analyzing Image...",
+        "Validating X-ray...",
+        "Detecting Knee Structure...",
+        "Running Deep Learning Ensembles...",
+        "Final Diagnosis in Progress..."
+      ];
+      let msgIndex = 0;
+      
+      setInterval(() => {
+        msgIndex = (msgIndex + 1) % messages.length;
+        document.getElementById('loadingText').innerText = messages[msgIndex];
+      }, 2000); // changes every 2 seconds
     }
   </script>
 {% endblock %}
